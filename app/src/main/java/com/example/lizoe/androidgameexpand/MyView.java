@@ -23,7 +23,6 @@ import android.view.SurfaceView;
 import java.util.Random;
 import java.util.Vector;
 
-
 public class MyView extends SurfaceView implements Callback, Runnable {
     private SurfaceHolder sfh;
     private Paint paint;
@@ -49,7 +48,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     private Bitmap bmpBackGround;//游戏背景
     private Bitmap bmpStart1;
     private Bitmap bmpStart2;
-    private Bitmap bmpSound, bmpSound2;
     public static boolean soundFlag = true;
 
     private Bitmap bmpPause_bg;
@@ -89,8 +87,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     private Background backGround;
 
     private GamePause gamePause;
-
-    public static SoundIcon soundIcon;
 
     //声明主角对象
     private Player player;
@@ -132,7 +128,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     public static int soundId_long, shoot, enemy_shoot;
 
     //背景音乐
-
     public static MediaPlayer mediaPlayer;
     public static MediaPlayer mediaPlayer2;
     private AudioManager am;
@@ -219,9 +214,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             bmpStart1 = BitmapFactory.decodeResource(res, R.drawable.start1);
             bmpStart1 = BitmapFactory.decodeResource(res, R.drawable.start2);
 
-            bmpSound = BitmapFactory.decodeResource(res, R.drawable.sound);
-            bmpSound2 = BitmapFactory.decodeResource(res, R.drawable.sound2);
-
             bmpPause_bg = BitmapFactory.decodeResource(res, R.drawable.pause_bg);
             bmpPause_back = BitmapFactory.decodeResource(res, R.drawable.pause_back);
             bmpPause_continue = BitmapFactory.decodeResource(res, R.drawable.pause_continue);
@@ -262,8 +254,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             gameMenu = new GameMenu(bmpMenu, bmpButton, bmpButtonPress, bmpStart1, bmpStart2);
             //暂停菜单实例
             gamePause = new GamePause(bmpPause_bg, bmpPause_back, bmpPause_continue, bmpPause_exit);
-            //静音键实例
-            soundIcon = new SoundIcon(bmpSound, bmpSound2);
 
             //实例游戏背景
             backGround = new Background(bmpBackGround, null);
@@ -305,9 +295,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         if (!soundFlag) {
                             mediaPlayer.start();
                         }
-
                         gameMenu.draw(canvas, paint);
-                        soundIcon.draw(canvas, paint);
                         break;
                     case GAMEING:
                         //游戏背景，画布canvasclip是实时截图，为了暂停后，描绘后面的背景，见书本283
@@ -402,14 +390,12 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             case GAME_MENU:
                 //菜单的触屏事件处理
                 gameMenu.onTouchEvent(event);
-                soundIcon.onTouchEvent(event);
                 break;
             case GAMEING:
                 player.onTouchEvent(event);
                 backGround.onTouchEvent(event);
                 break;
             case GAME_PAUSE:
-                soundIcon.onTouchEvent(event);
                 gamePause.onTouchEvent(event);
                 break;
             case GAME_WIN:
@@ -973,5 +959,12 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         flag = false;
+    }
+
+    public interface EasyGameViewListener {
+
+        void easyGameViewEatFood();
+
+        void gameOver();
     }
 }
