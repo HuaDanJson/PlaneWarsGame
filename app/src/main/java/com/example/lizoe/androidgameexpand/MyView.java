@@ -20,6 +20,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 
+import com.example.lizoe.androidgameexpand.event.LoseGameEvent;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Random;
 import java.util.Vector;
 
@@ -70,7 +74,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     private Bitmap bmpEnemyWeapon;
 
     private Bitmap bmpGameWin;//游戏胜利背景
-    private Bitmap bmpGameLost;//游戏失败背景
 
     private Bitmap bmpPlayer;//游戏主角飞机
     private Bitmap bmpPlayerHp;//主角飞机血量
@@ -234,7 +237,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
 
 
             bmpGameWin = BitmapFactory.decodeResource(res, R.drawable.gamewin);
-            bmpGameLost = BitmapFactory.decodeResource(res, R.drawable.gamelost);
             bmpPlayer = BitmapFactory.decodeResource(res, R.drawable.player);
             bmpPlayerHp = BitmapFactory.decodeResource(res, R.drawable.hp);
             bmpMenu = BitmapFactory.decodeResource(res, R.drawable.menu);
@@ -364,7 +366,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         canvas.drawBitmap(bmpGameWin, 0, 0, paint);
                         break;
                     case GAME_LOST:
-                        canvas.drawBitmap(bmpGameLost, 0, 0, paint);
+                        EventBus.getDefault().post(new LoseGameEvent(10));
                         break;
                     default:
                         break;
@@ -545,12 +547,14 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         if (player.isCollsionWith(vcEnemy.elementAt(i))) {
                             //发生碰撞，主角血量-1
                             if (vcEnemy.elementAt(i).type == 5) {
-                                if (playerWeaponLevel <= 3)
+                                if (playerWeaponLevel <= 3) {
                                     playerWeaponLevel++;
+                                }
                             } else {
                                 player.setPlayerHp(player.getPlayerHp() - 1);
-                                if (playerWeaponLevel > 1)
+                                if (playerWeaponLevel > 1) {
                                     playerWeaponLevel--;
+                                }
                                 if (!soundFlag) {
                                     sp.play(soundId_long, 1f, 1f, 0, 0, 1);
                                 }
@@ -961,10 +965,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
         flag = false;
     }
 
-    public interface EasyGameViewListener {
-
-        void easyGameViewEatFood();
-
-        void gameOver();
+    public void setPlayerHp(int playerHp) {
+        player.setPlayerHp(playerHp);
     }
 }
