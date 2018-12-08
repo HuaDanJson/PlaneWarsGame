@@ -52,7 +52,6 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     private Bitmap bmpSound, bmpSound2;
     public static boolean soundFlag = true;
 
-    private Bitmap bmpGamePause; //游戏暂停
     private Bitmap bmpPause_bg;
     private Bitmap bmpPause_back;
     private Bitmap bmpPause_continue;
@@ -216,14 +215,13 @@ public class MyView extends SurfaceView implements Callback, Runnable {
         //当游戏状态处于菜单时，才会重置游戏
         if (gameState == GAME_MENU) {
             //加载游戏资源
-            bmpBackGround = BitmapFactory.decodeResource(res, R.drawable.bg3);
+            bmpBackGround = BitmapFactory.decodeResource(res, R.drawable.icon_bg);
             bmpStart1 = BitmapFactory.decodeResource(res, R.drawable.start1);
             bmpStart1 = BitmapFactory.decodeResource(res, R.drawable.start2);
 
             bmpSound = BitmapFactory.decodeResource(res, R.drawable.sound);
             bmpSound2 = BitmapFactory.decodeResource(res, R.drawable.sound2);
 
-            bmpGamePause = BitmapFactory.decodeResource(res, R.drawable.gamepause);
             bmpPause_bg = BitmapFactory.decodeResource(res, R.drawable.pause_bg);
             bmpPause_back = BitmapFactory.decodeResource(res, R.drawable.pause_back);
             bmpPause_continue = BitmapFactory.decodeResource(res, R.drawable.pause_continue);
@@ -268,7 +266,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             soundIcon = new SoundIcon(bmpSound, bmpSound2);
 
             //实例游戏背景
-            backGround = new Background(bmpBackGround, bmpGamePause);
+            backGround = new Background(bmpBackGround, null);
             //实例主角
             player = new Player(bmpPlayer, bmpPlayerHp);
             //实例敌机容器
@@ -304,8 +302,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                             enemyArrayIndex = 0;
                             Pause_flag = 0;
                         }
-                        if (!soundFlag)
+                        if (!soundFlag) {
                             mediaPlayer.start();
+                        }
 
                         gameMenu.draw(canvas, paint);
                         soundIcon.draw(canvas, paint);
@@ -313,8 +312,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                     case GAMEING:
                         //游戏背景，画布canvasclip是实时截图，为了暂停后，描绘后面的背景，见书本283
 
-                        if (!soundFlag)
+                        if (!soundFlag) {
                             mediaPlayer2.start();
+                        }
 
                         backGround.draw(canvas, paint);
                         backGround.draw(canvasclip, paint);
@@ -361,17 +361,15 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                             vcBoom.elementAt(i).draw(canvasclip, paint);
 
                         }
-
                         break;
                     case GAME_PAUSE:
-
+                        //游戏暂停 start
                         paint2.setAlpha(245);
                         bmpPause_canvas2 = fastblur(bmpclip, 4);
                         canvas.drawBitmap(bmpPause_canvas2, 0, 0, paint);
-
-                        gamePause.draw(canvas, paint2);
-
-                        soundIcon.draw(canvas, paint);
+                        //游戏暂停 end
+//                        gamePause.draw(canvas, paint2);
+//                        soundIcon.draw(canvas, paint);
                         break;
 
                     case GAME_WIN:
@@ -379,6 +377,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         break;
                     case GAME_LOST:
                         canvas.drawBitmap(bmpGameLost, 0, 0, paint);
+                        break;
+                    default:
                         break;
                 }
             }
