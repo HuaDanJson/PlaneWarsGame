@@ -137,6 +137,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
 
     private Bitmap bmpclip;
     private Canvas canvasclip;
+    private int mScore;
 
     public MyView(Context context) {
         super(context);
@@ -363,10 +364,11 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         break;
 
                     case GAME_WIN:
-                        canvas.drawBitmap(bmpGameWin, 0, 0, paint);
+//                        canvas.drawBitmap(bmpGameWin, 0, 0, paint);
+                        EventBus.getDefault().post(new LoseGameEvent(1, mScore));
                         break;
                     case GAME_LOST:
-                        EventBus.getDefault().post(new LoseGameEvent(10));
+                        EventBus.getDefault().post(new LoseGameEvent(2, mScore));
                         break;
                     default:
                         break;
@@ -404,6 +406,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                 break;
             case GAME_LOST:
 
+                break;
+            default:
                 break;
         }
         return true;
@@ -448,6 +452,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                 break;
             case GAME_LOST:
                 break;
+            default:
+                break;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -480,6 +486,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             case GAME_WIN:
                 break;
             case GAME_LOST:
+                break;
+            default:
                 break;
         }
         return super.onKeyDown(keyCode, event);
@@ -614,6 +622,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                                     break;
                                 case Enemy.TYPE_WEAPON:
                                     break;
+                                default:
+                                    break;
                             }
 
                         }
@@ -632,8 +642,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         if (player.isCollsionWith(vcBullet.elementAt(i))) {
                             //发生碰撞，主角血量-1
                             player.setPlayerHp(player.getPlayerHp() - 1);
-                            if (playerWeaponLevel > 1)
+                            if (playerWeaponLevel > 1) {
                                 playerWeaponLevel--;
+                            }
                             //当主角血量小于0，判定游戏失败
                             if (player.getPlayerHp() <= -1) {
                                 gameState = GAME_LOST;
@@ -666,19 +677,20 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         }
                     } else if (67 > boss.hp && boss.hp >= 34 && countPlayerBullet % 8 == 0) {
                         vcBulletBoss.add(new Bullet(bmpEnemyBullet, boss.x + 50, boss.y + 30, Bullet.BULLET_BOSS, Bullet.DIR_DOWN_Random));
-                        if (!MyView.soundFlag)
+                        if (!MyView.soundFlag) {
                             MyView.sp.play(MyView.enemy_shoot, 1f, 0.5f, 0, 0, 1);
+                        }
                     } else if (34 > boss.hp && countPlayerBullet % 13 == 0) {
                         vcBulletBoss.add(new Bullet(bmpBossBullet, boss.x + 50, boss.y + 10, Bullet.BULLET_BOSS, Bullet.DIR_DOWN));
                         vcBulletBoss.add(new Bullet(bmpBossBullet, boss.x + 50, boss.y + 10, Bullet.BULLET_BOSS, Bullet.DIR_DOWN_LEFT));
                         vcBulletBoss.add(new Bullet(bmpBossBullet, boss.x + 50, boss.y + 10, Bullet.BULLET_BOSS, Bullet.DIR_DOWN_RIGHT));
-                        if (!MyView.soundFlag)
+                        if (!MyView.soundFlag) {
                             MyView.sp.play(MyView.enemy_shoot, 1f, 0.5f, 0, 0, 1);
+                        }
                     }
-                    if (countPlayerBullet % 100 == 0)
+                    if (countPlayerBullet % 100 == 0) {
                         Bullet.flag = -Bullet.flag;
-
-
+                    }
                     //Boss子弹逻辑
                     for (int i = 0; i < vcBulletBoss.size(); i++) {
                         Bullet b = vcBulletBoss.elementAt(i);
@@ -693,8 +705,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         if (player.isCollsionWith(vcBulletBoss.elementAt(i))) {
                             //发生碰撞，主角血量-1
                             player.setPlayerHp(player.getPlayerHp() - 1);
-                            if (playerWeaponLevel > 1)
+                            if (playerWeaponLevel > 1) {
                                 playerWeaponLevel--;
+                            }
                             //当主角血量小于0，判定游戏失败
                             if (player.getPlayerHp() <= -1) {
                                 gameState = GAME_LOST;
@@ -710,6 +723,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                             }
                             if (boss.hp <= 0) {
                                 //游戏胜利
+                                mScore = mScore + 5;
                                 gameState = GAME_WIN;
                             } else {
                                 //及时删除本次碰撞的子弹，防止重复判定此子弹与Boss碰撞、
@@ -727,9 +741,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                 //每0.5秒添加一个主角子弹
                 countPlayerBullet++;
                 if (countPlayerBullet % 10 == 0) {
-                    if (playerWeaponLevel == 1)
+                    if (playerWeaponLevel == 1) {
                         vcBulletPlayer.add(new Bullet(bmpBullet, player.x - bmpPlayer.getWidth() / 5, player.y - 15, Bullet.BULLET_PLAYER));
-                    else if (playerWeaponLevel == 2) {
+                    } else if (playerWeaponLevel == 2) {
                         vcBulletPlayer.add(new Bullet(bmpBullet2, player.x - bmpPlayer.getWidth() / 5, player.y - 15, Bullet.BULLET_PLAYER, Bullet.DIR_UP_LEFT2));
                         vcBulletPlayer.add(new Bullet(bmpBullet2, player.x - bmpPlayer.getWidth() / 5, player.y - 15, Bullet.BULLET_PLAYER, Bullet.DIR_UP_RIGHT2));
                     } else if (playerWeaponLevel == 3) {
@@ -757,6 +771,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                     if (boom.playEnd) {
                         //播放完毕的从容器中删除
                         vcBoom.removeElementAt(i);
+                        mScore++;
                     } else {
                         vcBoom.elementAt(i).logic();
                     }
@@ -768,6 +783,8 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             case GAME_WIN:
                 break;
             case GAME_LOST:
+                break;
+            default:
                 break;
         }
     }
@@ -967,5 +984,39 @@ public class MyView extends SurfaceView implements Callback, Runnable {
 
     public void setPlayerHp(int playerHp) {
         player.setPlayerHp(playerHp);
+    }
+
+    public void reStartGame() {
+        mScore = 0;
+        setPlayerHp(3);
+        gameState = GAMEING;
+        //Boss状态设置为没出现
+        isBoss = false;
+        //重置游戏
+        initGame();
+        //重置怪物出场
+        enemyArrayIndex = 0;
+        //如果游戏暂停中  就开始游戏
+        if (soundFlag && mediaPlayer != null) {
+            mediaPlayer.pause();
+            //MySurfaceView.mediaPlayer2.start();
+        } else if (mediaPlayer != null && mediaPlayer2 != null) {
+            mediaPlayer.pause();
+            mediaPlayer2.start();
+        }
+    }
+
+    public void continueGame() {
+        mScore = 0;
+        setPlayerHp(3);
+        //如果游戏暂停中  就开始游戏
+        gameState = GAMEING;
+        if (soundFlag) {
+            mediaPlayer.pause();
+            //MySurfaceView.mediaPlayer2.start();
+        } else {
+            mediaPlayer.pause();
+            mediaPlayer2.start();
+        }
     }
 }

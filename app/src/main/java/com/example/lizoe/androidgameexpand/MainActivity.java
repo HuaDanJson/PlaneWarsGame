@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
     @BindView(R.id.iv_lose_continue_main_activity) ImageView mLoseContinue;
     @BindView(R.id.iv_lose_exit_main_activity) ImageView mLoseExit;
     @BindView(R.id.ll_lose_game_main_activity) RelativeLayout mLoseGameView;
+    private int type;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,9 +98,12 @@ public class MainActivity extends Activity {
 
     @OnClick(R.id.iv_lose_continue_main_activity)
     public void onLoseContinueClicked() {
+        if (type == 1) {
+            mMyView.reStartGame();
+        } else {
+            mMyView.continueGame();
+        }
         mLoseGameView.setVisibility(View.GONE);
-        mMyView.setPlayerHp(3);
-        startGame();
     }
 
     @OnClick(R.id.iv_lose_exit_main_activity)
@@ -117,6 +121,12 @@ public class MainActivity extends Activity {
     public void receiveLoseGameEvent(LoseGameEvent event) {
         if (event == null) {return;}
         mLoseGameView.setVisibility(View.VISIBLE);
-        mLoseScore.setText("得分：" + String.valueOf(event.getLoseScore()));
+        if (event.getType() == 1) {
+            type = 1;
+            mLoseScore.setText("胜利：得分：" + String.valueOf(event.getLoseScore()));
+        } else {
+            mLoseScore.setText("失败：得分：" + String.valueOf(event.getLoseScore()));
+            type = 2;
+        }
     }
 }
