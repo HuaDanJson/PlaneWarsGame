@@ -12,11 +12,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <TextView
+        android:id="@+id/tv_appear_score_main_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/dp10"
+        android:layout_marginTop="@dimen/dp10"
+        android:text="得分：0"
+        android:textColor="@color/first_name_remind_text_color"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
     <ImageView
         android:id="@+id/iv_pause_main_activity"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_appear_score_main_activity"
         android:layout_marginRight="@dimen/dp10"
         android:layout_marginTop="@dimen/dp10"
         android:padding="@dimen/dp8"

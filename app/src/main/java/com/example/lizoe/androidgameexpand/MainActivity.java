@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.lizoe.androidgameexpand.event.LoseGameEvent;
+import com.example.lizoe.androidgameexpand.event.ScoreEvent;
 import com.example.lizoe.androidgameexpand.event.StartGameEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,6 +30,7 @@ public class MainActivity extends Activity {
     @BindView(R.id.iv_sound_main_activity) ImageView mSound;
 
     @BindView(R.id.tv_lose_score_main_activity) TextView mLoseScore;
+    @BindView(R.id.tv_appear_score_main_activity) TextView mAppearScore;
     @BindView(R.id.iv_lose_continue_main_activity) ImageView mLoseContinue;
     @BindView(R.id.iv_lose_exit_main_activity) ImageView mLoseExit;
     @BindView(R.id.ll_lose_game_main_activity) RelativeLayout mLoseGameView;
@@ -98,12 +100,8 @@ public class MainActivity extends Activity {
 
     @OnClick(R.id.iv_lose_continue_main_activity)
     public void onLoseContinueClicked() {
-        if (type == 1) {
-            mMyView.reStartGame();
-        } else {
-            mMyView.continueGame();
-        }
         mLoseGameView.setVisibility(View.GONE);
+        mMyView.reStartGame();
     }
 
     @OnClick(R.id.iv_lose_exit_main_activity)
@@ -115,12 +113,14 @@ public class MainActivity extends Activity {
     public void receiveStartGameEvent(StartGameEvent event) {
         mPause.setVisibility(View.VISIBLE);
         mSound.setVisibility(View.VISIBLE);
+        mAppearScore.setVisibility(View.VISIBLE);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void receiveLoseGameEvent(LoseGameEvent event) {
         if (event == null) {return;}
         mLoseGameView.setVisibility(View.VISIBLE);
+        mAppearScore.setText("得分：0");
         if (event.getType() == 1) {
             type = 1;
             mLoseScore.setText("胜利：得分：" + String.valueOf(event.getLoseScore()));
@@ -128,5 +128,11 @@ public class MainActivity extends Activity {
             mLoseScore.setText("失败：得分：" + String.valueOf(event.getLoseScore()));
             type = 2;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void receiveScoreEvent(ScoreEvent event) {
+        if (event == null) {return;}
+        mAppearScore.setText("得分：" + String.valueOf(event.getScore()));
     }
 }

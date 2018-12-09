@@ -21,6 +21,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 
 import com.example.lizoe.androidgameexpand.event.LoseGameEvent;
+import com.example.lizoe.androidgameexpand.event.ScoreEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -28,10 +29,11 @@ import java.util.Random;
 import java.util.Vector;
 
 public class MyView extends SurfaceView implements Callback, Runnable {
+
     private SurfaceHolder sfh;
     private Paint paint;
     private Paint paint2;
-    private Thread th;
+    private Thread mThread;
     private boolean flag;
     private Canvas canvas;
     public static int screenW, screenH;
@@ -201,9 +203,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
         initGame();
         flag = true;
         //实例线程
-        th = new Thread(this);
+        mThread = new Thread(this);
         //启动线程
-        th.start();
+        mThread.start();
     }
 
     /*
@@ -365,9 +367,11 @@ public class MyView extends SurfaceView implements Callback, Runnable {
 
                     case GAME_WIN:
 //                        canvas.drawBitmap(bmpGameWin, 0, 0, paint);
+                        flag = false;
                         EventBus.getDefault().post(new LoseGameEvent(1, mScore));
                         break;
                     case GAME_LOST:
+                        flag = false;
                         EventBus.getDefault().post(new LoseGameEvent(2, mScore));
                         break;
                     default:
@@ -724,6 +728,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                             if (boss.hp <= 0) {
                                 //游戏胜利
                                 mScore = mScore + 5;
+                                EventBus.getDefault().post(new ScoreEvent(mScore));
                                 gameState = GAME_WIN;
                             } else {
                                 //及时删除本次碰撞的子弹，防止重复判定此子弹与Boss碰撞、
@@ -772,6 +777,7 @@ public class MyView extends SurfaceView implements Callback, Runnable {
                         //播放完毕的从容器中删除
                         vcBoom.removeElementAt(i);
                         mScore++;
+                        EventBus.getDefault().post(new ScoreEvent(mScore));
                     } else {
                         vcBoom.elementAt(i).logic();
                     }
@@ -987,9 +993,9 @@ public class MyView extends SurfaceView implements Callback, Runnable {
     }
 
     public void reStartGame() {
+        gameState = GAME_MENU;
         mScore = 0;
         setPlayerHp(3);
-        gameState = GAMEING;
         //Boss状态设置为没出现
         isBoss = false;
         //重置游戏
@@ -1004,6 +1010,12 @@ public class MyView extends SurfaceView implements Callback, Runnable {
             mediaPlayer.pause();
             mediaPlayer2.start();
         }
+        //实例线程
+        flag = true;
+        mThread = new Thread(this);
+        //启动线程
+        mThread.start();
+        gameState = GAMEING;
     }
 
     public void continueGame() {
